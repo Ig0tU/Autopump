@@ -33,6 +33,9 @@ The official maintainers are in the [MAINTAINERS.md](MAINTAINERS.md) file. Leave
 
 ### Prerequisites
 - Install [uv](https://github.com/astral-sh/uv), a fast Python package manager.
+- Optional: Install [Ollama](https://ollama.ai/) for local AI analysis
+- Optional: Install [LM Studio](https://lmstudio.ai/) for local AI models
+- Optional: Get a [Gemini API key](https://makersuite.google.com/app/apikey) for cloud AI
 
 > If Python is already installed, `uv` will detect and use it automatically.
 
@@ -85,11 +88,70 @@ pump_bot
 
 # Option 2: run directly
 uv run src/bot_runner.py
+
+# Option 3: use CLI interface
+pump_cli bot start bots/bot-sniper-1-geyser.yaml
+
+# Option 4: start web UI
+pump_webui
 ```
 
 > **You're all set! 🎉** 
 
 ---
+
+## Key Features
+
+- **Multi-platform support**: pump.fun and letsbonk.fun
+- **Multiple listening methods**: WebSocket logs, block subscription, Geyser
+- **Trading strategies**: Time-based, take profit/stop loss, manual
+- **Priority fee management**: Dynamic and fixed fee strategies
+- **Account cleanup**: Automated token account management
+- **Extreme fast mode**: Skip validation for faster execution
+- **AI-powered analysis**: Local and cloud AI models for trading decisions
+- **Web UI**: Complete browser-based management interface
+- **CLI interface**: Command-line tools for advanced users
+
+## Security Considerations
+
+- Rate limiting and retry mechanisms
+
+## AI Features
+
+The bot now supports AI-powered trading analysis using multiple providers:
+
+### Supported AI Providers
+- **Ollama**: Local AI models (llama3.2, mistral, etc.)
+- **LM Studio**: Local model hosting platform
+- **LocalAI**: Self-hosted OpenAI-compatible API
+- **Gemini**: Google's cloud AI service
+
+### AI Configuration
+```bash
+# Configure AI providers
+pump_cli ai configure ollama --url http://localhost:11434 --model llama3.2
+pump_cli ai configure gemini --api-key YOUR_API_KEY
+
+# Check provider health
+pump_cli ai health
+
+# Analyze a token
+pump_cli ai analyze --name "Test Token" --symbol "TEST" --price 0.001
+```
+
+### Web UI
+Access the complete web interface at `http://localhost:8080` after running:
+```bash
+pump_webui
+```
+
+The web UI provides:
+- Real-time bot monitoring and control
+- AI provider management and health checks
+- Token analysis with multiple AI models
+- Trade history and performance tracking
+- Live log streaming
+- Configuration management
 
 ## Note on throughput & limits
 
@@ -209,4 +271,3 @@ As of April 30, 2025, all changes from **refactored/main-v2** are merged into th
 - Implementation approach: Gradual rollout in separate branch
 - Priority: Stages progress from simple to complex features
 - Completion guarantee: Full completion of Stage 1, other stages dependent on feedback and feasibility
-
