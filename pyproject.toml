@@ -20,6 +20,7 @@ dependencies = [
     "protobuf>=5.29.4",
     "pyyaml>=6.0.2",
     "uvloop>=0.21.0",
+    "click>=8.1.0",
 ]
 
 [project.optional-dependencies]
@@ -29,6 +30,8 @@ dev = [
 
 [project.scripts]
 pump_bot = "bot_runner:main"
+pump_cli = "cli.main:cli"
+pump_webui = "webui.server:main"
 
 [tool.ruff]
 exclude = [

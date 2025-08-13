@@ -27,6 +27,8 @@ from trading.base import TradeResult
 from trading.platform_aware import PlatformAwareBuyer, PlatformAwareSeller
 from trading.position import Position
 from utils.logger import get_logger
+from ai.manager import AIManager
+from trading.ai_enhanced_trader import AIEnhancedTrader
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -83,6 +85,9 @@ class UniversalTrader:
         bro_address: str | None = None,
         marry_mode: bool = False,
         yolo_mode: bool = False,
+        # AI configuration
+        ai_config: dict[str, Any] | None = None,
+        enable_ai_analysis: bool = False,
     ):
         """Initialize the universal trader."""
         # Core components
@@ -190,6 +195,24 @@ class UniversalTrader:
         self.processing: bool = False
         self.processed_tokens: set[str] = set()
         self.token_timestamps: dict[str, float] = {}
+        
+        # AI enhancement
+        self.ai_enhanced_trader = None
+        if enable_ai_analysis and ai_config:
+            try:
+                self.ai_enhanced_trader = AIEnhancedTrader(
+                    self.solana_client,
+                    self.wallet,
+                    self.priority_fee_manager,
+                    ai_config,
+                    buy_amount,
+                    buy_slippage,
+                    sell_slippage,
+                    max_retries
+                )
+                logger.info("🧠 AI-enhanced trading enabled")
+            except Exception as e:
+                logger.error(f"Failed to initialize AI trader: {e}")
 
     async def start(self) -> None:
         """Start the trading bot and listen for new tokens."""
@@ -335,6 +358,10 @@ class UniversalTrader:
             self.token_timestamps.pop(key, None)
 
         await self.solana_client.close()
+        
+        # Close AI trader if available
+        if self.ai_enhanced_trader:
+            await self.ai_enhanced_trader.close()
 
     async def _queue_token(self, token_info: TokenInfo) -> None:
         """Queue a token for processing if not already processed."""
@@ -408,7 +435,13 @@ class UniversalTrader:
             logger.info(
                 f"Buying {self.buy_amount:.6f} SOL worth of {token_info.symbol} on {token_info.platform.value}..."
             )
-            buy_result: TradeResult = await self.buyer.execute(token_info)
+            
+            # Use AI-enhanced trader if available
+            if self.ai_enhanced_trader:
+                logger.info("🧠 Using AI-enhanced trading analysis...")
+                buy_result: TradeResult = await self.ai_enhanced_trader.analyze_and_trade(token_info)
+            else:
+                buy_result: TradeResult = await self.buyer.execute(token_info)
 
             if buy_result.success:
                 await self._handle_successful_buy(token_info, buy_result)

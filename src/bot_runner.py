@@ -135,6 +135,9 @@ async def start_bot(config_path: str):
             bro_address=cfg["filters"].get("bro_address"),
             marry_mode=cfg["filters"].get("marry_mode", False),
             yolo_mode=cfg["filters"].get("yolo_mode", False),
+            # AI configuration
+            ai_config=cfg.get("ai"),
+            enable_ai_analysis=cfg.get("ai", {}).get("enabled", False),
         )
 
         await trader.start()
